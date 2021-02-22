@@ -1,0 +1,15 @@
+#!/usr/bin/env bash
+
+read -r host < /proc/sys/kernel/hostname
+read -r kernel < /proc/sys/kernel/osrelease
+. /etc/os-release
+
+mem_total="$(free -m | grep 'Mem:' | awk '{print $2}')"
+mem_used="$(free -m | grep 'Mem:' | awk '{print $3}')"
+
+echo ""
+echo "${USER}@${host}"
+echo "OS: ${PRETTY_NAME}"
+echo "Kernel: ${kernel}"
+echo "Memory: ${mem_used}/${mem_total}"
+echo ""

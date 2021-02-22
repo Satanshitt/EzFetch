@@ -1,15 +1,58 @@
 #!/usr/bin/env bash
 
-read -r host < /proc/sys/kernel/hostname
-read -r kernel < /proc/sys/kernel/osrelease
+esc=""
+greenf="${esc}[32m"
+
+read -r host </proc/sys/kernel/hostname
+read -r kernel </proc/sys/kernel/osrelease
 . /etc/os-release
 
 mem_total="$(free -m | grep 'Mem:' | awk '{print $2}')"
 mem_used="$(free -m | grep 'Mem:' | awk '{print $3}')"
 
-echo ""
-echo "${USER}@${host}"
-echo "OS: ${PRETTY_NAME}"
-echo "Kernel: ${kernel}"
-echo "Memory: ${mem_used}/${mem_total}"
-echo ""
+uptime=$(uptime -p | sed s/up\ //)
+cpu=$(hwinfo --short --cpu)
+shell=$(echo $($SHELL --version) | cut -d'(' -f1)
+
+if [ -n "$XDG_CURRENT_DESKTOP" ]; then
+    de=$(echo "$XDG_CURRENT_DESKTOP")
+else
+    de=$(echo "No desktop environment found.")
+fi
+
+totaldisk=$(df -h -x aufs -x tmpfs -x overlay -x drvfs --total 2>/dev/null | tail -1)
+disktotal=$(awk '{print $2}' <<<"${totaldisk}")
+diskused=$(awk '{print $3}' <<<"${totaldisk}")
+diskusedper=$(awk '{print $5}' <<<"${totaldisk}")
+diskusage="${diskused}/${disktotal} (${diskusedper})"
+
+c0='[0m'
+c1='[31m'
+c2='[32m'
+c3='[33m'
+c4='[34m'
+c5='[35m'
+c6='[36m'
+c7='[37m'
+c8='[38m'
+palette="[7m$c1 $c1 $c2 $c2 $c3 $c3 $c4 $c4 $c5 $c5 $c6 $c6 [m"
+
+echo "
+${c6}                 .                 
+${c6}                -#                 
+${c6}               .%%=                
+${c6}               #%%%.                     ${c2}${USER}${c7}@${c2}${host}
+${c6}              *%*+%+                     
+${c6}             =%#  #%:                    ${c2}OS: ${c7}${PRETTY_NAME}
+${c6} .=+========+%%+==*%#=========++=:       ${c2}Kernel: ${c7}${kernel}
+${c6}   -*%%%++++%%+====*%#++++#%%%*-.        ${c2}Uptime: ${c7}${uptime}
+${c6}      -#%=.+%+      #%:.=#%*-.           ${c2}Shell: ${c7}${shell}
+${c6}        :*%%%.      -%%%*-               ${c2}DE: ${c7}${de}
+${c6}          %%*%*-. -*%%%*                 ${c2}Disk: ${c7}${diskusage}
+${c6}         +%+  =%%%%*..%%-                ${c2}Terminal: ${c7}${TERM}
+${c6}        :%%-=#%#+-*%#=*%%.               ${c2}Memory: ${c7}${mem_used}/${mem_total}
+${c6}        #%%%#=.     -*%%%#               
+${c6}       *%*=.           -#%+         
+${c6}      .-.                .=.             ${palette}
+
+"

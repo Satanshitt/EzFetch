@@ -1,30 +1,8 @@
 #!/usr/bin/env bash
 
+#Colors
 esc=""
 greenf="${esc}[32m"
-
-read -r host </proc/sys/kernel/hostname
-read -r kernel </proc/sys/kernel/osrelease
-. /etc/os-release
-
-mem_total="$(free -m | grep 'Mem:' | awk '{print $2}')"
-mem_used="$(free -m | grep 'Mem:' | awk '{print $3}')"
-
-uptime=$(uptime -p | sed s/up\ //)
-cpu=$(hwinfo --short --cpu)
-shell=$(echo $($SHELL --version) | cut -d'(' -f1)
-
-if [ -n "$XDG_CURRENT_DESKTOP" ]; then
-    de=$(echo "$XDG_CURRENT_DESKTOP")
-else
-    de=$(echo "No desktop environment found.")
-fi
-
-totaldisk=$(df -h -x aufs -x tmpfs -x overlay -x drvfs --total 2>/dev/null | tail -1)
-disktotal=$(awk '{print $2}' <<<"${totaldisk}")
-diskused=$(awk '{print $3}' <<<"${totaldisk}")
-diskusedper=$(awk '{print $5}' <<<"${totaldisk}")
-diskusage="${diskused}/${disktotal} (${diskusedper})"
 
 c0='[0m'
 c1='[31m'
@@ -35,6 +13,37 @@ c5='[35m'
 c6='[36m'
 c7='[37m'
 c8='[38m'
+
+#Get the name of the user and the computer
+read -r host </proc/sys/kernel/hostname
+read -r kernel </proc/sys/kernel/osrelease
+. /etc/os-release
+
+#Pc usage time
+uptime=$(uptime -p | sed s/up\ //)
+
+#Shell information
+shell=$(echo $($SHELL --version) | cut -d'(' -f1)
+
+#Get information from the desktop environment
+if [ -n "$XDG_CURRENT_DESKTOP" ]; then
+    de=$(echo "$XDG_CURRENT_DESKTOP")
+else
+    de=$(echo "No desktop environment found.")
+fi
+
+#Disk usage
+totaldisk=$(df -h -x aufs -x tmpfs -x overlay -x drvfs --total 2>/dev/null | tail -1)
+disktotal=$(awk '{print $2}' <<<"${totaldisk}")
+diskused=$(awk '{print $3}' <<<"${totaldisk}")
+diskusedper=$(awk '{print $5}' <<<"${totaldisk}")
+diskusage="${diskused}/${disktotal} (${diskusedper})"
+
+#Memory usage
+mem_total="$(free -m | grep 'Mem:' | awk '{print $2}')"
+mem_used="$(free -m | grep 'Mem:' | awk '{print $3}')"
+
+#Color palette being used
 palette="[7m$c1 $c1 $c2 $c2 $c3 $c3 $c4 $c4 $c5 $c5 $c6 $c6 [m"
 
 echo "

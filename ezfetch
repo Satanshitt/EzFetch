@@ -1,9 +1,6 @@
 #!/usr/bin/env bash
 
 #Colors
-esc=""
-greenf="${esc}[32m"
-
 c0='[0m'
 c1='[31m'
 c2='[32m'

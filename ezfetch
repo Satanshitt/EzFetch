@@ -12,7 +12,7 @@ c7='[37m'
 c8='[38m'
 
 #Get the name of the user and the computer
-read -r host </proc/sys/kernel/hostname
+read -r host </proc/sys/kernel/hostnamea
 read -r kernel </proc/sys/kernel/osrelease
 . /etc/os-release
 
